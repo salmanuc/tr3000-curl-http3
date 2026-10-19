@@ -76,6 +76,7 @@ mkdir -p feeds/packages/net/curl
 # Copy our custom Makefile
 REPO_DIR="${GITHUB_WORKSPACE:-$(cd "$(dirname "$0")" && pwd)}"
 cp "$REPO_DIR/curl/Makefile" feeds/packages/net/curl/Makefile
+cp "$REPO_DIR/curl/Config.in" feeds/packages/net/curl/Config.in
 
 # Automatically calculate the SHA-256 hash for the selected curl version
 echo "==> Calculating curl source hash"
