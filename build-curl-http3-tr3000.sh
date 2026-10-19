@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build curl (+libcurl) with HTTP/3 for Cudy TR3000 on OpenWrt 25.12.5
+# Build curl (+libcurl) with HTTP/3 for Cudy TR3000 on OpenWrt 25.12.6
 # Target: mediatek/filogic, arch: aarch64_cortex-a53
 #
 # Uses the OpenWrt SDK (prebuilt toolchain) so you only compile this one
@@ -21,7 +21,7 @@
 
 set -euo pipefail
 
-RELEASE="25.12.5"
+RELEASE="25.12.6"
 TARGET="mediatek"
 SUBTARGET="filogic"
 ARCH="aarch64_cortex-a53"
