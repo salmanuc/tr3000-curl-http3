@@ -1,0 +1,60 @@
+name: Build curl with HTTP3 for Cudy TR3000
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            clang \
+            flex \
+            bison \
+            g++ \
+            gawk \
+            gettext \
+            git \
+            libncurses-dev \
+            libssl-dev \
+            python3 \
+            rsync \
+            unzip \
+            zlib1g-dev \
+            file \
+            wget \
+            curl \
+            zstd \
+            ca-certificates
+
+      - name: Prepare build directory
+        run: |
+          sed -i \
+            's|WORKDIR="$HOME/tr3000-curl-http3"|WORKDIR="$GITHUB_WORKSPACE/tr3000-curl-http3"|' \
+            build-curl-http3-tr3000.sh
+
+      - name: Build curl with HTTP3
+        run: |
+          chmod +x build-curl-http3-tr3000.sh
+          ./build-curl-http3-tr3000.sh
+
+      - name: Upload APK packages
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: curl-http3-cudy-tr3000
+          path: tr3000-curl-http3/output/*.apk
+          if-no-files-found: error
+          retention-days: 7
