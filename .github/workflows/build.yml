@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -51,10 +51,25 @@ jobs:
           ./build-curl-http3-tr3000.sh
 
       - name: Upload APK packages
-        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: curl-http3-cudy-tr3000
           path: tr3000-curl-http3/output/*.apk
           if-no-files-found: error
           retention-days: 7
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: curl-http3-build-${{ github.run_number }}
+          name: curl HTTP3 Build ${{ github.run_number }}
+          body: |
+            Automated build of curl with HTTP/3 support for Cudy TR3000.
+
+            Target: mediatek/filogic
+            Architecture: aarch64_cortex-a53
+
+            Verify compatibility with your router's firmware before installing.
+          files: tr3000-curl-http3/output/*.apk
+          fail_on_unmatched_files: true
+          make_latest: true
