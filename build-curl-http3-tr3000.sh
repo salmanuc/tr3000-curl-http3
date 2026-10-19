@@ -65,11 +65,35 @@ echo "==> Updating and installing feeds"
 ./scripts/feeds update -a
 ./scripts/feeds install -a
 
-echo "==> Overriding feeds/packages/net/curl with sbwml's HTTP3 curl"
-rm -rf feeds/packages/net/curl
-git clone --depth 1 https://github.com/sbwml/feeds_packages_net_curl.git feeds/packages/net/curl
+echo "==> Installing custom curl package from this repository"
 
-# Re-link the overridden package into package/feeds/packages
+# Remove sbwml's curl package
+rm -rf feeds/packages/net/curl
+
+# Create the package directory
+mkdir -p feeds/packages/net/curl
+
+# Copy our custom Makefile
+REPO_DIR="${GITHUB_WORKSPACE:-$(cd "$(dirname "$0")" && pwd)}"
+cp "$REPO_DIR/curl/Makefile" feeds/packages/net/curl/Makefile
+
+# Automatically calculate the SHA-256 hash for the selected curl version
+echo "==> Calculating curl source hash"
+
+CURL_VERSION=$(sed -n 's/^PKG_VERSION:=//p' feeds/packages/net/curl/Makefile)
+CURL_ARCHIVE="curl-${CURL_VERSION}.tar.bz2"
+CURL_URL="https://github.com/curl/curl/releases/download/curl-${CURL_VERSION//./_}/${CURL_ARCHIVE}"
+
+curl -fL "$CURL_URL" -o "/tmp/$CURL_ARCHIVE"
+
+CURL_HASH=$(sha256sum "/tmp/$CURL_ARCHIVE" | awk '{print $1}')
+
+sed -i "s/^PKG_HASH:=.*/PKG_HASH:=$CURL_HASH/" feeds/packages/net/curl/Makefile
+
+echo "curl version: $CURL_VERSION"
+echo "SHA-256: $CURL_HASH"
+
+# Register the custom package
 ./scripts/feeds install -f -p packages curl
 
 # ---------------------------------------------------------------------------
